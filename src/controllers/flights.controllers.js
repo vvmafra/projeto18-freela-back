@@ -1,13 +1,70 @@
-import { getFlightsRepository } from "../repositories/flights.repository.js"
+import { db } from "../database/database.connection.js"
+import { getFlightsDetailsRepository, getFlightsRepository } from "../repositories/flights.repository.js"
+import dayjs from "dayjs"
 
-export async function getFlightId(req, res){
+export async function getFlightCities(req, res){
     const {id} = req.params
  
     try {
-     const cityId = await getFlightsRepository(id)
-     if (cityId.rowCount === 0) return res.send("No Flights avaiable for this destination").status(404)
-     res.send(cityId.rows)
-    }catch (err) {
+     const flights = await getFlightsRepository(id)
+     if (flights.rowCount === 0) return res.status(404).send("No Flights avaiable for this destination")
+
+      const flightsObj = await db.query(`SELECT flights.id AS id, 
+      price, 
+      city1.name AS "departureCity", 
+      city2.name AS "arrivalCity",
+      flights."departureTime"
+      FROM flights
+      JOIN cities city1 ON flights."idCityFrom" = city1.id
+      JOIN cities city2 ON flights."idCityTo" = city2.id
+      GROUP BY flights.id, city1.name, city2.name`)
+
+    const flightsDetails = flightsObj.rows.map(item => {
+      const departureTime = dayjs(item.departureTime);
+    
+      const departureDay = departureTime.format('YYYY-MM-DD');
+      const departureHour = departureTime.format('HH:mm:ss');
+    
+
+    return {...item, departureDay, departureHour}
+  })
+     res.send(flightsDetails).status(200)
+     
+    } catch (err) {
      res.status(500).send(err.message)
    }
+ }
+
+ export async function getFlightId(req, res) {
+    const {id} = req.params
+
+    try {
+    const flight = await getFlightsDetailsRepository(id)
+    if (flight.rowCount === 0) return res.status(404).send("This Flight does not exist")
+
+    const departureTime = flight.rows[0].departureTime
+    const dateDeparture = dayjs(departureTime)
+    const dayDeparture = dateDeparture.format('DD-MM-YYYY')
+    const timeDeparture = dateDeparture.format('HH:mm')
+
+    const arrivalTime = flight.rows[0].arrivalTime
+    const dateArrival = dayjs(arrivalTime)
+    const dayArrival = dateArrival.format('DD-MM-YYYY')
+    const timeArrival = dateArrival.format('HH:mm')
+
+    const flightDetails = await db.query(`SELECT flights.id, price, 
+    city1.name AS "departureCity", 
+    city2.name AS "arrivalCity",
+    airlines.name AS "airline"
+    FROM flights
+    JOIN cities city1 ON flights."idCityFrom" = city1.id
+    JOIN cities city2 ON flights."idCityTo" = city2.id
+    JOIN airlines ON flights."idAirline" = airlines.id;`)
+
+    const flightObject = ({...flightDetails.rows[0], dayDeparture, timeDeparture, dayArrival, timeArrival})
+
+    res.send(flightObject)
+    } catch (err) {
+        res.status(500).send(err.message)
+      }
  }
