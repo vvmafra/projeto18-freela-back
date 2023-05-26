@@ -1,6 +1,7 @@
 import { db } from "../database/database.connection.js"
 import { getFlightsDetailsRepository, getFlightsRepository } from "../repositories/flights.repository.js"
 import dayjs from "dayjs"
+import flightsRouter from "../routes/flights.routes.js"
 
 export async function getFlightCities(req, res){
     const {id} = req.params
@@ -57,14 +58,18 @@ export async function getFlightCities(req, res){
     const dayArrival = dateArrival.format('DD-MM-YYYY')
     const timeArrival = dateArrival.format('HH:mm')
 
-    const flightDetails = await db.query(`SELECT flights.id, price, 
+    const flightDetails = await db.query(`SELECT flights.id as id, 
+    price, 
     city1.name AS "departureCity", 
     city2.name AS "arrivalCity",
     airlines.name AS "airline"
     FROM flights
     JOIN cities city1 ON flights."idCityFrom" = city1.id
     JOIN cities city2 ON flights."idCityTo" = city2.id
-    JOIN airlines ON flights."idAirline" = airlines.id;`)
+    JOIN airlines ON flights."idAirline" = airlines.id
+    WHERE flights.id=$1`, [id])
+
+    console.log(flightDetails.rows)
 
     const flightObject = ({...flightDetails.rows[0], dayDeparture, timeDeparture, dayArrival, timeArrival})
 
