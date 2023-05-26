@@ -10,9 +10,16 @@ export async function getFlightCities(req, res){
      const flights = await getFlightsRepository(id)
      if (flights.rowCount === 0) return res.status(404).send("No Flights avaiable for this destination")
 
+      const priceObj = await db.query(`SELECT 
+        MIN(flights.price) AS "minPrice",
+        MAX(flights.price) AS "maxPrice"
+        FROM flights`);
+        const minPrice = priceObj.rows[0].minPrice;
+        const maxPrice = priceObj.rows[0].maxPrice;
+
       const flightsObj = await db.query(`SELECT 
-      MIN(flights.price) AS minPrice,
-      MAX(flights.price) AS maxPrice,
+      MIN(flights.price) AS "minPrice",
+      MAX(flights.price) AS "maxPrice",
       flights.id AS id, 
       price, 
       city1.name AS "departureCity", 
@@ -21,11 +28,11 @@ export async function getFlightCities(req, res){
       FROM flights
       JOIN cities city1 ON flights."idCityFrom" = city1.id
       JOIN cities city2 ON flights."idCityTo" = city2.id
-      GROUP BY flights.id, city1.name, city2.name`)
+      GROUP BY flights.id, price, city1.name, city2.name`)
 
       const flightsDetails = {
-        minPrice: flightsObj.rows[0].minprice,
-        maxPrice: flightsObj.rows[0].maxprice,
+        minPrice,
+        maxPrice,
         flights: flightsObj.rows.map(item => {
           const departureTime = dayjs(item.departureTime);
           const departureDay = departureTime.format('DD-MM-YYYY');
