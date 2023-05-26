@@ -10,10 +10,10 @@ export async function getAccommodations(req, res){
 
     try {
         const accommodationsDetails = await db.query(`SELECT accommodations.id, 
-        accommodations.name, 
+        accommodations.name as name, 
         "pricePerDay",
         description,
-        cities.name
+        cities.name as city
         FROM accommodations
         JOIN cities ON cities.id = accommodations."idCity"
         WHERE cities.id=$1
