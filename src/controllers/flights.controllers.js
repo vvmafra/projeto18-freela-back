@@ -22,8 +22,8 @@ export async function getFlightCities(req, res){
     const flightsDetails = flightsObj.rows.map(item => {
       const departureTime = dayjs(item.departureTime);
     
-      const departureDay = departureTime.format('YYYY-MM-DD');
-      const departureHour = departureTime.format('HH:mm:ss');
+      const departureDay = departureTime.format('DD-MM-YYYY');
+      const departureHour = departureTime.format('HH:mm');
     
 
     return {...item, departureDay, departureHour}
