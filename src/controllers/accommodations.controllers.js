@@ -11,8 +11,8 @@ export async function getAccommodations(req, res){
     try {
 
         const priceObj = await db.query(`SELECT
-        MIN(price) AS "minPrice",
-        MAX(price) AS "maxPrice
+        MIN("pricePerDay") AS "minPrice",
+        MAX("pricePerDay") AS "maxPrice"
         FROM accommodations
         `)
 
@@ -32,9 +32,11 @@ export async function getAccommodations(req, res){
         `, [id])
 
         const accommodationDetails = {minPrice, maxPrice,
-        accommodations: accommodationsObj}
+        accommodations: accommodationsObj.rows}
 
-        res.send(accommodationDetails.rows)
+        console.log(accommodationDetails)
+
+        res.send(accommodationDetails)
     } catch (err) {
         res.status(500).send(err.message)
       }
