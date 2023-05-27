@@ -9,7 +9,18 @@ export async function getAccommodations(req, res){
     if (cityAccommodations.rowCount === 0) return res.status(404).send("No Accommodations avaiable for this destination")
 
     try {
-        const accommodationsDetails = await db.query(`SELECT accommodations.id, 
+
+        const priceObj = await db.query(`SELECT
+        MIN(price) AS "minPrice",
+        MAX(price) AS "maxPrice
+        FROM accommodations
+        `)
+
+        const minPrice = priceObj.rows[0].minPrice;
+        const maxPrice = priceObj.rows[0].maxPrice;
+
+        
+        const accommodationsObj = await db.query(`SELECT accommodations.id, 
         accommodations.name as name, 
         "pricePerDay",
         description,
@@ -19,7 +30,11 @@ export async function getAccommodations(req, res){
         WHERE cities.id=$1
         GROUP BY accommodations.id, cities.name
         `, [id])
-        res.send(accommodationsDetails.rows)
+
+        const accommodationDetails = {minPrice, maxPrice,
+        accommodations: accommodationsObj}
+
+        res.send(accommodationDetails.rows)
     } catch (err) {
         res.status(500).send(err.message)
       }
