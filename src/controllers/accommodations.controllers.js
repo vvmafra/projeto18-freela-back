@@ -60,7 +60,7 @@ export async function getAccommodationId(req, res){
         const accommodationDetails = await db.query(`SELECT accommodations.id, 
         accommodations.name, 
         accommodations."pricePerDay",
-        cities.name,
+        cities.name as city,
         accommodations.description
         FROM accommodations
         JOIN cities ON cities.id = accommodations."idCity"
@@ -70,7 +70,7 @@ export async function getAccommodationId(req, res){
         const facilitiesRows = facilities.rows
         const accommodationDetailsRows = accommodationDetails.rows[0]
         
-        const accommodationInfos = ({...accommodationDetailsRows, photosRows, facilitiesRows})
+        const accommodationInfos = ({...accommodationDetailsRows, photos: photosRows, facilities: facilitiesRows})
 
         res.send(accommodationInfos)
     } catch (err) {
