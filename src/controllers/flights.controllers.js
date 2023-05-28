@@ -28,7 +28,8 @@ export async function getFlightCities(req, res){
       FROM flights
       JOIN cities city1 ON flights."idCityFrom" = city1.id
       JOIN cities city2 ON flights."idCityTo" = city2.id
-      GROUP BY flights.id, price, city1.name, city2.name`)
+      WHERE city2.id=$1
+      GROUP BY flights.id, price, city1.name, city2.name`, [id])
 
       const flightsDetails = {
         minPrice,
