@@ -13,7 +13,8 @@ export async function getFlightCities(req, res){
       const priceObj = await db.query(`SELECT 
         MIN(flights.price) AS "minPrice",
         MAX(flights.price) AS "maxPrice"
-        FROM flights`);
+        FROM flights
+        WHERE "idCityTo"=$1`, [id]);
         const minPrice = priceObj.rows[0].minPrice;
         const maxPrice = priceObj.rows[0].maxPrice;
 
