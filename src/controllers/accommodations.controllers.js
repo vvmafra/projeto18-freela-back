@@ -14,7 +14,7 @@ export async function getAccommodations(req, res){
         MIN("pricePerDay") AS "minPrice",
         MAX("pricePerDay") AS "maxPrice"
         FROM accommodations
-        `)
+        WHERE "idCity"=$1`, [id])
 
         const minPrice = priceObj.rows[0].minPrice;
         const maxPrice = priceObj.rows[0].maxPrice;
