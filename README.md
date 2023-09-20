@@ -35,7 +35,7 @@ Using this site, you can choose the ideal flight and accommodation for your trip
 
 ## How to use
 
-1. Clone my Wallet back-end repository: https://github.com/vvmafra/projeto14-mywallet-back :
+1. Clone this repository: https://github.com/vvmafra/projeto18-freela-back :
 - Install dependecies with: 
 ```bash
 $ npm install
@@ -46,7 +46,7 @@ $ npm install
 $ npm run dev
 ```
 
-2. Clone this repository: https://github.com/vvmafra/projeto14-mywallet-front :
+2. Clone Freela front-end repository: https://github.com/vvmafra/projeto18-freela-front:
 - Install dependecies with:
 ```bash
 $ npm install
